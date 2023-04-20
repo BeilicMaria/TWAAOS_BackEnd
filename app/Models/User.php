@@ -22,12 +22,14 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'userName',
+        'lastName', 'firstName',
+        'collegeDegree',
+        'program',
+        'year',
+        'financialStatus',
         'email',
         'password',
-        'fullName',
-        'phone',
-        'FK_addressId',
+        'google_id',
         'FK_roleId'
     ];
 
@@ -50,14 +52,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /* RELATIONSHIPS*/
-    /**
-     * Get the address associated with the user.
-     */
-    public function address()
-    {
-        return $this->hasOne(Address::class, "id", "FK_addressId");
-    }
+
 
     /**
      * Get the role associated with the user.

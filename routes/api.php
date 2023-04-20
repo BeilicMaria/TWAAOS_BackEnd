@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AddressesController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use Illuminate\Support\Facades\Route;
@@ -23,17 +22,19 @@ use App\Http\Controllers\UsersController;
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'login']);
 
+
+//Google
+Route::get('/auth/google', [LoginController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+
 //..............................THIS ROUTES ARE FOR  AUTHENTICATED USERS............................
 Route::group(['middleware' => 'auth:api'], function () {
-    Route::post('logout', [LogoutController::class], 'logout');
+    Route::post('logout', [LogoutController::class, 'logout']);
     //..............................USER............................
     Route::get('users/{page?}/{per_page?}/{sort?}/{order?}/{filter?}', [UsersController::class, 'index']);
     Route::get('user/{id}', [UsersController::class, 'get']);
     //..............................ROLE............................
     Route::get('roles', [RolesController::class, 'index']);
     Route::get('role/{id}', [RolesController::class, 'get']);
-    //..............................ADDRESS............................
-    Route::get('address/{id}', [AddressesController::class, 'get']);
-    Route::post('address/{id?}', [AddressesController::class, 'post']);
-    Route::delete('address', [AddressesController::class, 'delete']);
+
 });

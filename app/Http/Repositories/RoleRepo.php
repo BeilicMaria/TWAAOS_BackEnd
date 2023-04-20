@@ -1,23 +1,15 @@
 <?php
 
-namespace App\Repositories;
+namespace  App\Http\Repositories;
 
 use Illuminate\Container\Container as App;
 
-class UserRepo extends Repository
+class RoleRepo extends Repository
 {
-
-    /**
-     * __construct
-     *
-     * @param  mixed $app
-     * @return void
-     */
     public function __construct(App $app)
     {
         parent::__construct($app);
     }
-
 
     /**
      * specify model class name
@@ -25,6 +17,6 @@ class UserRepo extends Repository
      */
     public function model()
     {
-        return '\App\Models\User';
+        return '\App\Models\Role';
     }
 }

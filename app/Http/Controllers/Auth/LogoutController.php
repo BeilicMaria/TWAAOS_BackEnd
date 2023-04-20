@@ -10,6 +10,8 @@ use Lcobucci\JWT\Parser;
 use \Response;
 use Illuminate\Support\Facades\Log;
 use DB;
+use Illuminate\Support\Facades\Auth;
+
 class LogoutController extends Controller
 {
 
@@ -27,15 +29,14 @@ class LogoutController extends Controller
     public function logout(Request $request)
     {
         try {
+            $user = Auth::user();
             $value = $request->bearerToken();
-            $id = (new Parser())->parse($value)->getClaim('jti');
-
+            $id = app(Parser::class)->parse($value)->claims()->get('jti');
+            $accessToken = $user->token();
             DB::table('oauth_access_tokens')
                 ->where('id', $id)
-                ->update([
-                    'revoked' => true
-                ]);
-
+                ->delete();
+            $accessToken->revoke();
             return response(ErrorAndSuccessMessages::logoutSuccess, HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);

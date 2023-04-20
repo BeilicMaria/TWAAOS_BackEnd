@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\AddressRepo;
+use App\Http\Repositories\UserRepo;
 use App\Repositories\RoleRepo;
-use App\Repositories\UserRepo;
+
 use App\Utils\ErrorAndSuccessMessages;
 use App\Utils\HttpStatusCode;
 use Exception;
@@ -19,11 +19,11 @@ class RegisterController extends Controller
 
 
     /**
-     * addressRepo, roleRepo, userRepo, companyRepo
+     *  roleRepo, userRepo, companyRepo
      *
      * @var mixed
      */
-    protected $addressRepo, $roleRepo, $userRepo;
+    protected  $roleRepo, $userRepo;
 
 
     /**
@@ -34,9 +34,9 @@ class RegisterController extends Controller
      * @param  mixed $user
      * @return void
      */
-    function __construct(AddressRepo $address, RoleRepo $role, UserRepo $user)
+    function __construct(RoleRepo $role, UserRepo $user)
     {
-        $this->addressRepo = $address;
+
         $this->roleRepo = $role;
         $this->userRepo = $user;
     }
@@ -64,11 +64,6 @@ class RegisterController extends Controller
 
             $userValidatedData['password'] = bcrypt($request->password);
 
-            //create Address
-            $userValidatedData['FK_addressId'] = $this->addressRepo->create($request->all());
-            if (!isset($userValidatedData['FK_addressId'])) {
-                return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
-            }
 
             //create user
 

@@ -1,4 +1,4 @@
-<?php namespace App\Repositories;
+<?php namespace  App\Http\Repositories;
 
 interface IRepository {
     public function all($columns = array('*'));

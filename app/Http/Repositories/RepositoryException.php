@@ -1,4 +1,6 @@
-<?php  namespace App\Repositories;
+<?php  namespace  App\Http\Repositories;
+
+use Exception;
 
 class RepositoryException extends Exception{
 

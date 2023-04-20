@@ -1,5 +1,6 @@
 <?php
 
+use Database\Seeders\AdminSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Database\Seeder;
 
@@ -13,5 +14,6 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(RoleSeeder::class);
+        $this->call(AdminSeeder::class);
     }
 }
