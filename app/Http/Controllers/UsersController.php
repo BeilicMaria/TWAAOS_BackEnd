@@ -16,6 +16,7 @@ class UsersController extends Controller
 
     function __construct()
     {
+
     }
     /**
      * index get all users

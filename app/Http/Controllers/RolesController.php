@@ -28,7 +28,8 @@ class RolesController extends Controller
      */
     function __construct(RoleRepo $role)
     {
-        $this->roleRepo = $role;
+
+        000
     }
 
     /**
