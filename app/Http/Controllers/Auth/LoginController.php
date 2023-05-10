@@ -13,6 +13,7 @@ use Exception;
 use \Response;
 use \Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
@@ -38,36 +39,43 @@ class LoginController extends Controller
 
 
 
-
-
     /**
-     * redirectToGoogle Google Login
+     * redirectToAuth
      *
-     *
-     *
+     * @return void
      */
-    public function redirectToGoogle()
+    public function redirectToAuth()
     {
 
-        return Socialite::driver('google')->stateless()->redirect();
+        return response()->json([
+            'url' => Socialite::driver('google')
+                ->stateless()
+                ->redirect()
+                ->getTargetUrl(),
+        ]);
     }
 
-    /**
-     * handleGoogleCallback Google callback
-     *
-     *
-     *
-     */
-    public function handleGoogleCallback()
-    {
 
-        $userSocial  = Socialite::driver('google')->stateless()->user();
-        $user = User::where(['email' => $userSocial->getEmail()])->first();
-        if ($user) {
-            $accessToken = auth()->user()->createToken('authToken')->accessToken;
-            $user = $this->userRepo->findBy('email', $userSocial->getEmail());
-            return response()->json(['user' => $user, 'access_token' => $accessToken], HttpStatusCode::OK);
-        } else {
+    /**
+     * handleAuthCallback
+     *
+     * @return void
+     */
+    public function handleAuthCallback()
+    {
+        try {
+            /** @var SocialiteUser $socialiteUser */
+            $socialiteUser = Socialite::driver('google')->stateless()->user();
+            $user = User::where(['email' => $socialiteUser->getEmail()])->first();
+            if ($user) {
+                $accessToken = $user->createToken('authToken')->accessToken;
+
+                // $user = $this->userRepo->findBy('email', $socialiteUser->getEmail());
+                return response()->json(['user' => $user, 'access_token' => $accessToken], HttpStatusCode::OK);
+            } else {
+                return response()->json(ErrorAndSuccessMessages::loginFailed, HttpStatusCode::Unauthorized);
+            }
+        } catch (Exception $e) {
             return response()->json(ErrorAndSuccessMessages::loginFailed, HttpStatusCode::Unauthorized);
         }
     }

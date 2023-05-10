@@ -14,7 +14,7 @@ class ReportsTable extends Migration
     public function up()
     {
         Schema::create('reports', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->date('date_start');
             $table->date('date_stop');
         });

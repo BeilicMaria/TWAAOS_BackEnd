@@ -16,7 +16,7 @@ class AlterTableUsers extends Migration
         Schema::table('users', function (Blueprint $table) {
             if (!Schema::hasColumns("users", [
                 "lastName", "firstName", 'year', 'financialStatus',
-                "FK_roleId", "google_id", "registration_number", "PepleSoftID"
+                "FK_roleId", "google_id", "registration_number", "peopleSoftId"
             ])) {
                 $table->string('lastName');
                 $table->string('firstName');
@@ -27,7 +27,7 @@ class AlterTableUsers extends Migration
                     ->references('id')->on('user_roles');
                 $table->string('google_id')->nullable();
                 $table->string('registration_number')->nullable();
-                $table->string('PepleSoftID')->nullable();
+                $table->string('peopleSoftId')->nullable();
             }
             if (Schema::hasColumn("users", "name")) {
                 $table->dropColumn("name");

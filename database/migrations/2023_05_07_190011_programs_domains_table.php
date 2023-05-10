@@ -14,7 +14,6 @@ class ProgramsDomainsTable extends Migration
     public function up()
     {
         Schema::create('programs_domains', function (Blueprint $table) {
-            $table->id();
             $table->integer('FK_programId')->unsigned();
             $table->foreign('FK_programId')
                 ->references('id')->on('programs');

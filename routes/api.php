@@ -24,8 +24,8 @@ Route::post('login', [LoginController::class, 'login']);
 
 
 //Google
-Route::get('/auth/google', [LoginController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [LoginController::class, 'handleGoogleCallback']);
+Route::get('/auth', [LoginController::class, 'redirectToAuth']);
+Route::get('/auth/callback', [LoginController::class, 'handleAuthCallback']);
 
 //..............................THIS ROUTES ARE FOR  AUTHENTICATED USERS............................
 Route::group(['middleware' => 'auth:api'], function () {

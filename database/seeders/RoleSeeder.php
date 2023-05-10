@@ -15,14 +15,14 @@ class RoleSeeder extends Seeder
     public function run()
     {
         $roles = array(
-            array('role' => "admin"),
-            array('role' => "student"),
-            array('role' => "analyst"),
-            array('role' => "validator"),
+            array('name' => "admin"),
+            array('name' => "student"),
+            array('name' => "secretary"),
+            array('name' => "manager"),
         );
         for ($i = 0; $i < count($roles); $i++) {
             DB::table('user_roles')->insert([
-                'role' => $roles[$i]['role'],
+                'name' => $roles[$i]['name'],
                 'created_at' => date("y-m-d h:i:s"),
                 'updated_at' => date("y-m-d h:i:s")
             ]);
