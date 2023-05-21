@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Http\Services\RoleRepo;
+use App\Models\Role;
 use App\Utils\ErrorAndSuccessMessages;
 use App\Utils\HttpStatusCode;
 use Exception;
@@ -28,7 +28,7 @@ class RolesController extends Controller
      */
     function __construct(RoleRepo $role)
     {
-
+        $this->roleRepo = $role;
     }
 
     /**

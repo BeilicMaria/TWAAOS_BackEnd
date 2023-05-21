@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Services\UserRepo;
-use App\Http\Services\RoleRepo;
+use App\Http\Repositories\UserRepo;
+use App\Http\Services\RoleRepo as ServicesRoleRepo;
+use App\Repositories\RoleRepo;
 
 use App\Utils\ErrorAndSuccessMessages;
 use App\Utils\HttpStatusCode;
@@ -34,7 +35,7 @@ class RegisterController extends Controller
      * @param  mixed $user
      * @return void
      */
-    function __construct(RoleRepo $role, UserRepo $user)
+    function __construct(ServicesRoleRepo $role, UserRepo $user)
     {
 
         $this->roleRepo = $role;

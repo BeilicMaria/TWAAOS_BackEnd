@@ -2,7 +2,7 @@
 
 namespace  App\Http\Services;
 
-use  App\Http\Repositories\Repository;
+use App\Http\Repositories\Repository;
 use Illuminate\Container\Container as App;
 
 class UserRepo extends Repository
