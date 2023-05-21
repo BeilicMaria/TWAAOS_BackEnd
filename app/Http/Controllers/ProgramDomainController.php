@@ -2,54 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
-use App\Http\Services\RoleRepo;
-use App\Utils\ErrorAndSuccessMessages;
-use App\Utils\HttpStatusCode;
-use Exception;
 use Illuminate\Http\Request;
-use \Response;
-use Illuminate\Support\Facades\Log;
 
-class RolesController extends Controller
+class ProgramDomainController extends Controller
 {
-    /**
-     * roleRepo
+        /**
+     * programdomainRepo
      *
      * @var mixed
      */
-    protected $roleRepo;
+    protected $programdomainRepo;
 
     /**
      * __construct
      *
-     * @param  mixed $role
+     * @param  mixed $programdomain
      * @return void
      */
-    function __construct(RoleRepo $role)
+    function __construct(ProgramDomainRepo $programdomain)
     {
 
     }
 
     /**
-     * getIndex get all roles
+     * getIndex get all programsdomians
      *
      * @return void
      */
     public function index()
     {
         try {
-            $roles = $this->roleRepo->all();
-            if (!isset($roles))
+            $programsdomains = $this->programdomainRepo->all();
+            if (!isset($programsdomains))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['roles' => $roles]], HttpStatusCode::OK);
+            return Response::json([['programs_domains' => $programsdomains]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
     }
 
     /**
-     * get role by id
+     * get programdomain by id
      *
      * @param  mixed $id
      * @return void
@@ -57,10 +50,10 @@ class RolesController extends Controller
     public function get($id)
     {
         try {
-            $role = Role::find($id);
-            if (!isset($role))
+            $programdomain = Role::find($id);
+            if (!isset($program))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['role' => $role]], HttpStatusCode::OK);
+            return Response::json([['program_domain' => $programdomain]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);

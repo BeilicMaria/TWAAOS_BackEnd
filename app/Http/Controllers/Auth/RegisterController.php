@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositories\UserRepo;
-use App\Repositories\RoleRepo;
+use App\Http\Services\UserRepo;
+use App\Http\Services\RoleRepo;
 
 use App\Utils\ErrorAndSuccessMessages;
 use App\Utils\HttpStatusCode;

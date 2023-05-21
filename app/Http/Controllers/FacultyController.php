@@ -2,23 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
-use App\Http\Services\RoleRepo;
-use App\Utils\ErrorAndSuccessMessages;
-use App\Utils\HttpStatusCode;
-use Exception;
 use Illuminate\Http\Request;
-use \Response;
-use Illuminate\Support\Facades\Log;
 
-class RolesController extends Controller
+class FacultyController extends Controller
 {
     /**
-     * roleRepo
+     * facultyRepo
      *
      * @var mixed
      */
-    protected $roleRepo;
+    protected $facultyRepo;
 
     /**
      * __construct
@@ -26,30 +19,30 @@ class RolesController extends Controller
      * @param  mixed $role
      * @return void
      */
-    function __construct(RoleRepo $role)
+    function __construct(FacultyRepo $faculty)
     {
 
     }
 
     /**
-     * getIndex get all roles
+     * getIndex get all faculties
      *
      * @return void
      */
     public function index()
     {
         try {
-            $roles = $this->roleRepo->all();
-            if (!isset($roles))
+            $faculties = $this->facultyRepo->all();
+            if (!isset($faculties))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['roles' => $roles]], HttpStatusCode::OK);
+            return Response::json([['faculties' => $faculties]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
     }
 
     /**
-     * get role by id
+     * get faculty by id
      *
      * @param  mixed $id
      * @return void
@@ -57,10 +50,10 @@ class RolesController extends Controller
     public function get($id)
     {
         try {
-            $role = Role::find($id);
-            if (!isset($role))
+            $faculty = Role::find($id);
+            if (!isset($faculty))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['role' => $role]], HttpStatusCode::OK);
+            return Response::json([['faculty' => $faculty]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);

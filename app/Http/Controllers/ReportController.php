@@ -2,54 +2,47 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
-use App\Http\Services\RoleRepo;
-use App\Utils\ErrorAndSuccessMessages;
-use App\Utils\HttpStatusCode;
-use Exception;
 use Illuminate\Http\Request;
-use \Response;
-use Illuminate\Support\Facades\Log;
 
-class RolesController extends Controller
+class ReportController extends Controller
 {
     /**
-     * roleRepo
+     * reportRepo
      *
      * @var mixed
      */
-    protected $roleRepo;
+    protected $reportRepo;
 
     /**
      * __construct
      *
-     * @param  mixed $role
+     * @param  mixed $report
      * @return void
      */
-    function __construct(RoleRepo $role)
+    function __construct(ReportRepo $report)
     {
 
     }
 
     /**
-     * getIndex get all roles
+     * getIndex get all reports
      *
      * @return void
      */
     public function index()
     {
         try {
-            $roles = $this->roleRepo->all();
-            if (!isset($roles))
+            $reports = $this->reportRepo->all();
+            if (!isset($reports))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['roles' => $roles]], HttpStatusCode::OK);
+            return Response::json([['reports' => $reports]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
     }
 
     /**
-     * get role by id
+     * get report by id
      *
      * @param  mixed $id
      * @return void
@@ -57,10 +50,10 @@ class RolesController extends Controller
     public function get($id)
     {
         try {
-            $role = Role::find($id);
-            if (!isset($role))
+            $report = Role::find($id);
+            if (!isset($report))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['role' => $role]], HttpStatusCode::OK);
+            return Response::json([['report' => $report]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);
