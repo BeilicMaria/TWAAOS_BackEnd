@@ -4,44 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class FacultyController extends Controller
+class ReportController extends Controller
 {
     /**
-     * facultyRepo
+     * reportRepo
      *
      * @var mixed
      */
-    protected $facultyRepo;
+    protected $reportRepo;
 
     /**
      * __construct
      *
-     * @param  mixed $role
+     * @param  mixed $report
      * @return void
      */
-    function __construct(FacultyRepo $faculty)
+    function __construct(ReportRepo $report)
     {
+
     }
 
     /**
-     * getIndex get all faculties
+     * getIndex get all reports
      *
      * @return void
      */
     public function index()
     {
         try {
-            $faculties = $this->facultyRepo->all();
-            if (!isset($faculties))
+            $reports = $this->reportRepo->all();
+            if (!isset($reports))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['faculties' => $faculties]], HttpStatusCode::OK);
+            return Response::json([['reports' => $reports]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
     }
 
     /**
-     * get faculty by id
+     * get report by id
      *
      * @param  mixed $id
      * @return void
@@ -49,10 +50,10 @@ class FacultyController extends Controller
     public function get($id)
     {
         try {
-            $faculty = Role::find($id);
-            if (!isset($faculty))
+            $report = Role::find($id);
+            if (!isset($report))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['faculty' => $faculty]], HttpStatusCode::OK);
+            return Response::json([['report' => $report]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);

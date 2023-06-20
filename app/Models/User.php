@@ -64,4 +64,17 @@ class User extends Authenticatable
     {
         return $this->hasOne(Role::class, "id", "FK_roleId");
     }
+
+    public function certificate_student()
+    {
+        return $this->belongsTo(Certficate::class, "FK_studentId");
+    }
+    public function certficate_secretary()
+    {
+        return $this->belongsTo(Certficate::class, "FK_secretaryId");
+    }
+    public function programuser()
+    {
+        return $this->belongsTo(ProgramUser::class, "FK_userId");
+    }
 }

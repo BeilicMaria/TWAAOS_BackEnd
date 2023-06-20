@@ -4,44 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class FacultyController extends Controller
+class DomainController extends Controller
 {
     /**
-     * facultyRepo
+     * domainRepo
      *
      * @var mixed
      */
-    protected $facultyRepo;
+    protected $domainRepo;
 
     /**
      * __construct
      *
-     * @param  mixed $role
+     * @param  mixed $domain
      * @return void
      */
-    function __construct(FacultyRepo $faculty)
+    function __construct(DomainRepo $domain)
     {
+
     }
 
     /**
-     * getIndex get all faculties
+     * getIndex get all domains
      *
      * @return void
      */
     public function index()
     {
         try {
-            $faculties = $this->facultyRepo->all();
-            if (!isset($faculties))
+            $domains = $this->domainRepo->all();
+            if (!isset($domains))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['faculties' => $faculties]], HttpStatusCode::OK);
+            return Response::json([['roles' => $domains]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
     }
 
     /**
-     * get faculty by id
+     * get domain by id
      *
      * @param  mixed $id
      * @return void
@@ -49,10 +50,10 @@ class FacultyController extends Controller
     public function get($id)
     {
         try {
-            $faculty = Role::find($id);
-            if (!isset($faculty))
+            $domain = Role::find($id);
+            if (!isset($domain))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['faculty' => $faculty]], HttpStatusCode::OK);
+            return Response::json([['domain' => $domain]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);

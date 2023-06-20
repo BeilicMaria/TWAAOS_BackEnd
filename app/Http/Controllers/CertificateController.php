@@ -4,44 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class FacultyController extends Controller
+class CertificateController extends Controller
 {
     /**
-     * facultyRepo
+     * certificaterepor
      *
      * @var mixed
      */
-    protected $facultyRepo;
+    protected $certificaterepo;
 
     /**
      * __construct
      *
-     * @param  mixed $role
+     * @param  mixed $certifcates
      * @return void
      */
-    function __construct(FacultyRepo $faculty)
+    function __construct(CertificateRepo $certificaterepo)
     {
+
     }
 
     /**
-     * getIndex get all faculties
+     * getIndex get all certificates
      *
      * @return void
      */
     public function index()
     {
         try {
-            $faculties = $this->facultyRepo->all();
-            if (!isset($faculties))
+            $certifcates = $this->certificaterepo->all();
+            if (!isset($certficates))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['faculties' => $faculties]], HttpStatusCode::OK);
+            return Response::json([['certficates' => $certficates]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
     }
 
     /**
-     * get faculty by id
+     * get role by id
      *
      * @param  mixed $id
      * @return void
@@ -49,10 +50,10 @@ class FacultyController extends Controller
     public function get($id)
     {
         try {
-            $faculty = Role::find($id);
-            if (!isset($faculty))
+            $certficate = Role::find($id);
+            if (!isset($certficate))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['faculty' => $faculty]], HttpStatusCode::OK);
+            return Response::json([['certficate' => $certficate]], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);

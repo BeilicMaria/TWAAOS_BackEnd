@@ -4,7 +4,7 @@ namespace  App\Http\Services;
 
 use Illuminate\Container\Container as App;
 
-class FacultyRepo extends Repository
+class CertificateRepo extends Repository
 {
     public function __construct(App $app)
     {
@@ -17,6 +17,6 @@ class FacultyRepo extends Repository
      */
     public function model()
     {
-        return '\App\Models\Faculty';
+        return '\App\Models\Certificate';
     }
 }
