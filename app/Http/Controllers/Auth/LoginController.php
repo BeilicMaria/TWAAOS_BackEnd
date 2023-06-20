@@ -69,7 +69,6 @@ class LoginController extends Controller
             $user = User::where(['email' => $socialiteUser->getEmail()])->first();
             if ($user) {
                 $accessToken = $user->createToken('authToken')->accessToken;
-
                 // $user = $this->userRepo->findBy('email', $socialiteUser->getEmail());
                 return response()->json(['user' => $user, 'access_token' => $accessToken], HttpStatusCode::OK);
             } else {
