@@ -12,7 +12,8 @@ class Program extends Model
     protected $primaryKey = 'id';
     protected $fillable = [
         'name',
-        'acronym'
+        'acronym',
+        'FK_domainId'
     ];
     public function programdomain()
     {

@@ -21,6 +21,7 @@ class ProgramsUsersTable extends Migration
             $table->integer('FK_userId')->unsigned();
             $table->foreign('FK_userId')
                 ->references('id')->on('users');
+            $table->timestamps();
         });
     }
 

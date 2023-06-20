@@ -17,6 +17,7 @@ class ReportsTable extends Migration
             $table->increments('id');
             $table->date('date_start');
             $table->date('date_stop');
+            $table->timestamps();
         });
     }
 

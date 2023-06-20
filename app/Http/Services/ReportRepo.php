@@ -3,6 +3,7 @@
 namespace  App\Http\Services;
 
 use Illuminate\Container\Container as App;
+use App\Http\Repositories\Repository;
 
 class ReportRepo extends Repository
 {

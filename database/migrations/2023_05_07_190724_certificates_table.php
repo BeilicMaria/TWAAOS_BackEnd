@@ -24,6 +24,7 @@ class CertificatesTable extends Migration
             $table->integer('FK_secretaryId')->unsigned();
             $table->foreign('FK_secretaryId')
                 ->references('id')->on('users');
+            $table->timestamps();
         });
     }
 

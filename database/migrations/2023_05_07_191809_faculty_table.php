@@ -18,6 +18,7 @@ class FacultyTable extends Migration
             $table->string('name');
             $table->string('acronym');
             $table->string('academic_year');
+            $table->timestamps();
         });
     }
 

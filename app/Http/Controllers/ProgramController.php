@@ -2,7 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\ProgramRepo;
+use App\Models\Program;
+use App\Utils\ErrorAndSuccessMessages;
+use App\Utils\HttpStatusCode;
 use Illuminate\Http\Request;
+use Exception;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use \Response;
 
 class ProgramController extends Controller
 {
@@ -21,7 +29,7 @@ class ProgramController extends Controller
      */
     function __construct(ProgramRepo $program)
     {
-
+        $this->programRepo = $program;
     }
 
     /**
@@ -35,7 +43,7 @@ class ProgramController extends Controller
             $programs = $this->programRepo->all();
             if (!isset($programs))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['programs' => $programs]], HttpStatusCode::OK);
+            return Response::json(['programs' => $programs], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
         }
@@ -50,13 +58,37 @@ class ProgramController extends Controller
     public function get($id)
     {
         try {
-            $program = Role::find($id);
+            $program = $this->programRepo->find($id);
             if (!isset($program))
                 return Response::make(ErrorAndSuccessMessages::getDataFailed, HttpStatusCode::BadRequest);
-            return Response::json([['program' => $program]], HttpStatusCode::OK);
+            return Response::json(['program' => $program], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::json($e, HttpStatusCode::BadRequest);
+        }
+    }
+
+    /**
+     * post
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function post(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'programs' => 'required',
+
+            ]);
+            if ($validator->fails() || count($request->programs) == 0) {
+                return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
+            }
+            $programs = Program::insert($request->programs);
+            return Response::make(['programs' => $programs], HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
         }
     }
 }

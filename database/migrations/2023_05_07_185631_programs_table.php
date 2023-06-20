@@ -17,6 +17,10 @@ class ProgramsTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('acronym')->unique();
+            $table->integer('FK_domainId')->unsigned();
+            $table->foreign('FK_domainId')
+                ->references('id')->on('domains');
+            $table->timestamps();
         });
     }
 
