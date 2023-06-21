@@ -32,8 +32,7 @@ class User extends Authenticatable
         'registration_number',
         'peopleSoftId',
         'password',
-        'google_id',
-        'FK_roleId'
+        'fathersInitial'
     ];
 
     /**
@@ -67,14 +66,15 @@ class User extends Authenticatable
 
     public function certificate_student()
     {
-        return $this->belongsTo(Certficate::class, "FK_studentId");
+        return $this->belongsToMany(Certficate::class, "FK_studentId");
     }
     public function certficate_secretary()
     {
-        return $this->belongsTo(Certficate::class, "FK_secretaryId");
+        return $this->belongsToMany(Certficate::class, "FK_secretaryId");
     }
-    public function programuser()
+
+    public function studyPrograms()
     {
-        return $this->belongsTo(ProgramUser::class, "FK_userId");
+        return $this->belongsToMany(Program::class, "programs_users",);
     }
 }

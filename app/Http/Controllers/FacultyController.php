@@ -74,18 +74,25 @@ class FacultyController extends Controller
      * @param  mixed $request
      * @return void
      */
-    public function post(Request $request)
+    public function put(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:55',
+                'name' => 'required|string|max:100',
                 'acronym' => 'required|string|max:55',
                 'academic_year' => 'required|string',
             ]);
             if ($validator->fails()) {
                 return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
             }
-            $faculty = $this->facultyRepo->create($request->all());
+            if (isset($request->id)) {
+                $faculty = $this->facultyRepo->find($request->id);
+                $faculty['name'] = $request->name;
+                $faculty['acronym'] = $request->acronym;
+                $faculty['academic_year'] = $request->academic_year;
+                $faculty->save();
+            } else
+                $faculty = $this->facultyRepo->create($request->all());
             return Response::make(['faculty' => $faculty], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);

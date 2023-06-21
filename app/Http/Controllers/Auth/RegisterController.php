@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Repositories\UserRepo;
 use App\Http\Services\RoleRepo as ServicesRoleRepo;
+use App\Http\Services\UserRepo;
 use App\Repositories\RoleRepo;
 
 use App\Utils\ErrorAndSuccessMessages;
@@ -14,6 +14,7 @@ use \Response;
 use DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+
 
 class RegisterController extends Controller
 {

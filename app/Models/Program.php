@@ -15,12 +15,9 @@ class Program extends Model
         'acronym',
         'FK_domainId'
     ];
-    public function programdomain()
+
+    public function user()
     {
-        return $this->belongsTo(ProgramDomain::class, "FK_programId");
-    }
-    public function programuser()
-    {
-        return $this->belongsTo(ProgramUser::class, "FK_programId");
+        return $this->belongsTo(ProgramUser::class, "programs_users");
     }
 }

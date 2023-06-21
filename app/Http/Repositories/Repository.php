@@ -10,7 +10,6 @@ use \Exception;
 
 abstract class Repository implements IRepository
 {
-
     /**
      * @var App
      */
@@ -121,6 +120,48 @@ abstract class Repository implements IRepository
     {
         return $this->model->where($attribute, '=', $value)->first($columns);
     }
+
+
+
+    /**
+     * findByAll
+     *
+     * @param  mixed $attribute
+     * @param  mixed $value
+     * @param  mixed $columns
+     * @return void
+     */
+    public function findByAll($attribute, $value)
+    {
+        return $this->model->where($attribute, '=', $value)->get();
+    }
+
+
+    /**
+     * getAllWithRelationship
+     *
+     * @param  mixed $relationships
+     * @return void
+     */
+    public function getAllWithRelationship($relationships)
+    {
+        $all = $this->model->get(array('*'));
+        return $all->load($relationships);
+    }
+
+
+    /**
+     * getByIdWithRelationship
+     *
+     * @param  mixed $relationships
+     * @return void
+     */
+    public function getByIdWithRelationship($id, $relationships, $columns = array('*'))
+    {
+        $model = $this->model->find($id, $columns);
+        return $model->load($relationships);
+    }
+
 
 
 }

@@ -13,8 +13,4 @@ class Domain extends Model
     protected $fillable = [
         'name'
     ];
-    public function programdomain()
-    {
-        return $this->belongsTo(ProgramDomain::class, "FK_domainId");
-    }
 }

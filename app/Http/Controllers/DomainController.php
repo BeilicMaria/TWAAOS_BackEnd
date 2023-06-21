@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\DomainRepo;
-use App\Models\Domain;
 use App\Utils\ErrorAndSuccessMessages;
 use App\Utils\HttpStatusCode;
 use Illuminate\Http\Request;
@@ -78,7 +77,7 @@ class DomainController extends Controller
      * @param  mixed $request
      * @return void
      */
-    public function post(Request $request)
+    public function put(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -87,11 +86,39 @@ class DomainController extends Controller
             if ($validator->fails()) {
                 return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
             }
-            $domains = Domain::insert($request->domains);
-            return Response::make(['domains' => $domains], HttpStatusCode::OK);
+            $domains = $request->domains;
+            foreach ($domains as  $domain) {
+                if (isset($domain['id'])) {
+                    $oldDomain = $this->domainRepo->find($domain['id']);
+                    $oldDomain['name'] = $domain['name'];
+                    $oldDomain->save();
+                } else {
+                    $domain = $this->domainRepo->create($domain);
+                }
+            }
+            $DBdomains = $this->domainRepo->all();
+            return Response::make(['domains' => $DBdomains], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
             return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
+    }
+
+
+    /**
+     * delete
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function delete($id)
+    {
+        try {
+            $this->domainRepo->delete($id);
+            return Response::make(ErrorAndSuccessMessages::deleteSuccess, HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::deleteFailed, HttpStatusCode::BadRequest);
         }
     }
 }

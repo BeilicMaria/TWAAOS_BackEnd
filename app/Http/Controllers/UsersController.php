@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\UserRepo;
+use App\Models\Program;
 use App\Models\User;
 use App\Utils\ErrorAndSuccessMessages;
 use App\Utils\HttpStatusCode;
@@ -10,13 +12,27 @@ use DB;
 use \Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UsersController extends Controller
 {
 
-    function __construct()
-    {
+    /**
+     * userRepo
+     *
+     * @var mixed
+     */
+    protected $userRepo;
 
+    /**
+     * __construct
+     *
+     * @param  mixed $user
+     * @return void
+     */
+    function __construct(UserRepo $user)
+    {
+        $this->userRepo = $user;
     }
     /**
      * index get all users
@@ -30,11 +46,7 @@ class UsersController extends Controller
                 $page = 1;
                 $per_page = 20;
             }
-            $users = User::with(["role" => function ($query) {
-                $query->select('id', 'role');
-            }, "address" => function ($query) {
-                $query->select('id', 'country', 'county', 'city', 'address');
-            }])->skip($per_page * ($page - 1))->take($per_page);
+            $users = User::with(["studyPrograms"])->where('FK_roleId', '=', 2)->skip($per_page * ($page - 1))->take($per_page);
             $count = DB::table('users');
             if (isset($filter) && $filter != "" && $filter != "null") {
                 $users->where('name', 'like', "%" . $filter . "%");
@@ -46,12 +58,11 @@ class UsersController extends Controller
             else {
                 $users->orderBy("id", "desc");
             }
-
             $users = $users->get();
-            return Response::json([["total_count" => $count, "items" => $users]], HttpStatusCode::OK);
+            return Response::json(["total_count" => $count, "items" => $users], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e->getMessage());
-            return Response::json($e->getMessage(), HttpStatusCode::BadRequest);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
         }
     }
 
@@ -74,7 +85,130 @@ class UsersController extends Controller
             return Response::json(["user" => $user], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
-            return Response::json($e, HttpStatusCode::BadRequest);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
+    }
+
+    /**
+     * getStaffData
+     *
+     * @return void
+     */
+    public function getStaffData()
+    {
+        try {
+            $dean = $this->userRepo->findBy('FK_roleId', 4);
+            $newSecretaries = array();
+            $secretaries = User::where('FK_roleId', '=', 3)->with(['studyPrograms'])->get();
+            foreach ($secretaries as  $secretary) {
+                $array = array();
+
+                foreach ($secretary->studyPrograms as  $program) {
+                    array_push($array, $program['id']);
+                }
+                $secretary['studyPrograms'] = $array;
+                array_push($newSecretaries, $secretary);
+            }
+            return Response::json(["dean" => $dean, "secretaries" => $newSecretaries], HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
+    }
+
+    /**
+     * addOrUpdateStaff
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function addOrUpdateStaff(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'firstName' => 'required|string|max:55',
+                'lastName' => 'required|string|max:55',
+                'email' => 'email|required|E-Mail',
+                'secretaries' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
+            }
+            //decan
+            if (isset($request->id)) {
+                $dean = $this->userRepo->find($request->id);
+                $dean['lastName'] = $request->lastName;
+                $dean['firstName'] = $request->firstName;;
+                $dean['email'] = $request->email;
+
+                $dean->save();
+            } else {
+                $deanData = $request->all();
+                $deanData['FK_roleId'] = 4;
+                $dean = $this->userRepo->create($deanData);
+            }
+            //secretare
+            $secretaries = $request->secretaries;
+            foreach ($secretaries as  $secretary) {
+                if (isset($secretary['id'])) {
+                    $oldDecretary = $this->userRepo->getByIdWithRelationship($secretary['id'], 'studyPrograms');
+                    $oldDecretary['lastName'] = $secretary['lastName'];
+                    $oldDecretary['firstName'] = $secretary['firstName'];
+                    $oldDecretary['email'] = $secretary['email'];
+                    $oldDecretary->save();
+                    if (isset($secretary['studyPrograms'])) {
+                        $programs = $secretary['studyPrograms'];
+                        $oldDecretary->studyPrograms()->sync($programs);
+                    }
+                } else {
+                    $secretary['FK_roleId'] = 3;
+                    $newSecretary = $this->userRepo->create($secretary);
+                    if (isset($secretary['studyPrograms'])) {
+                        $programs = $secretary['studyPrograms'];
+                        foreach ($programs as  $program) {
+                            $newSecretary->studyPrograms()->attach($program);
+                        }
+                    }
+                }
+            }
+            $newSecretaries = array();
+            $secretaries = User::where('FK_roleId', '=', 3)->with(['studyPrograms'])->get();
+            foreach ($secretaries as  $secretary) {
+                $array = array();
+
+                foreach ($secretary->studyPrograms as  $program) {
+                    array_push($array, $program['id']);
+                }
+                $secretary['studyPrograms'] = $array;
+                array_push($newSecretaries, $secretary);
+            }
+            return Response::json(["dean" => $dean, "secretaries" => $newSecretaries], HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
+    }
+
+
+    /**
+     * importUsers
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function importUsers(Request $request)
+    {
+        try {
+            $students = $request->students;
+            foreach ($students as  $student) {
+                $newStudent = $this->userRepo->create($student);
+                $program = Program::where('acronym', '=', $student['program'])->get();
+                $newStudent->studyPrograms()->attach($program[0]->id);
+            }
+            return Response::json("", HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
         }
     }
 }

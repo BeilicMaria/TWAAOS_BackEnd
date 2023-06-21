@@ -36,16 +36,21 @@ Route::group(['middleware' => 'auth:api'], function () {
     //..............................USER............................
     Route::get('users/{page?}/{per_page?}/{sort?}/{order?}/{filter?}', [UsersController::class, 'index']);
     Route::get('user/{id}', [UsersController::class, 'get']);
+    Route::get('getStaffData', [UsersController::class, 'getStaffData']);
+    Route::post('addOrUpdateStaff', [UsersController::class, 'addOrUpdateStaff']);
+    Route::post('importUsers', [UsersController::class, 'importUsers']);
     //..............................ROLE............................
     Route::get('roles', [RolesController::class, 'index']);
     Route::get('role/{id}', [RolesController::class, 'get']);
     //..............................Faculty............................
-    Route::post('faculty', [FacultyController::class, 'post']);
+    Route::post('faculty', [FacultyController::class, 'put']);
     Route::get('faculties', [FacultyController::class, 'index']);
     //..............................Domains............................
-    Route::post('domains', [DomainController::class, 'post']);
+    Route::post('domains', [DomainController::class, 'put']);
     Route::get('domains', [DomainController::class, 'index']);
+    Route::delete('domain/{id}', [DomainController::class, 'delete']);
     //..............................Programs............................
-    Route::post('programs', [ProgramController::class, 'post']);
+    Route::post('programs', [ProgramController::class, 'put']);
     Route::get('programs', [ProgramController::class, 'index']);
+    Route::delete('program/{id}', [ProgramController::class, 'delete']);
 });

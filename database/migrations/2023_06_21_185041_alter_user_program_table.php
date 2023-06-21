@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class ProgramsUsersTable extends Migration
+class AlterUserProgramTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class ProgramsUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('programs_users', function (Blueprint $table) {
-
-            $table->integer('program_id')->unsigned();
+        Schema::table('programs_users', function (Blueprint $table) {
+            $table->dropForeign(['program_id']);
             $table->foreign('program_id')
-                ->references('id')->on('programs');
-            $table->integer('user_id')->unsigned();
+                ->references('id')->on('programs')->onDelete('cascade');
+
+            $table->dropForeign(['user_id']);
             $table->foreign('user_id')
-                ->references('id')->on('users');
-            $table->timestamps();
+                ->references('id')->on('users')->onDelete('cascade');
         });
     }
 
