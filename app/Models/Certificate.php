@@ -11,10 +11,10 @@ class Certificate extends Model
     protected $table = "certificates";
     protected $primaryKey = 'id';
     protected $fillable = [
-        'role',
         'number',
         'reason',
         'date',
+        'status',
         'FK_studentId',
         'FK_secretaryId'
     ];

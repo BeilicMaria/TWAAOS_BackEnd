@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\UserRepo;
+use App\Models\Certificate;
 use App\Models\Domain;
+use App\Models\Faculty;
 use App\Models\Program;
 use App\Models\User;
 use App\Utils\ErrorAndSuccessMessages;
@@ -40,7 +42,7 @@ class UsersController extends Controller
      *
      * @return void
      */
-    public function index($page = null, $per_page = null, $sort = null, $order = null, $filter = null)
+    public function index($page = null, $per_page = null,  $order = null, $filter = null)
     {
         try {
             if (!isset($page) && !isset($per_pag)) {
@@ -48,17 +50,12 @@ class UsersController extends Controller
                 $per_page = 20;
             }
             $users = User::with(["studyPrograms"])->where('FK_roleId', '=', 2)->skip($per_page * ($page - 1))->take($per_page);
-            $count = DB::table('users');
             if (isset($filter) && $filter != "" && $filter != "null") {
-                $users->where('name', 'like', "%" . $filter . "%");
-                $count->where('name', 'like', "%" . $filter . "%");
+                $users->where('lastName', 'like', "%" . $filter . "%")->orWhere('firstName', 'like', "%" . $filter . "%");
             }
-            $count = $count->count();
-            if (isset($sort) && isset($order))
-                $users->orderBy($sort, $order);
-            else {
-                $users->orderBy("id", "desc");
-                        $users = $users->get();
+            $count = $users->count();
+            $users->orderBy("id", "desc");
+            $users = $users->get();
             $finalUsers = array();
             foreach ($users as  $user) {
                 $domain = Domain::find($user->studyPrograms[0]['FK_domainId']);
@@ -109,7 +106,6 @@ class UsersController extends Controller
             $secretaries = User::where('FK_roleId', '=', 3)->with(['studyPrograms'])->get();
             foreach ($secretaries as  $secretary) {
                 $array = array();
-
                 foreach ($secretary->studyPrograms as  $program) {
                     array_push($array, $program['id']);
                 }
@@ -279,19 +275,44 @@ class UsersController extends Controller
                 $student['peopleSoftId'] = $request->firstName;;
                 $student['fathersInitial'] = $request->email;
                 $student->save();
-                $student->studyPrograms()->sync($request->program);
+                $student->studyPrograms()->sync($request->study_programs[0]['id']);
             } else {
                 $newStudent = $this->userRepo->create($student);
                 $newStudent->studyPrograms()->attach($request->program);
             }
         } catch (Exception $e) {
             Log::debug($e);
-            return Response::make(ErrorAndSuccessMessages::deleteFailed, HttpStatusCode::BadRequest);
+            return Response::make(ErrorAndSuccessMessages::addFail, HttpStatusCode::BadRequest);
         }
     }
 
 
+    /**
+     * resetData
+     *
+     * @return void
+     */
     public function resetData()
     {
+        try {
+            DB::beginTransaction();
+            DB::statement("SET foreign_key_checks=0");
+            //sterg utilizatori
+            DB::table('users')->whereIn('FK_roleId', array(2, 3, 4))->delete();
+            //sterg programe
+            Program::truncate();
+            //sterg domenii
+            Domain::truncate();
+            //sterg facultate
+            Faculty::truncate();
+            //sterg adeverinte
+            Certificate::truncate();
+            DB::statement("SET foreign_key_checks=1");
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
     }
 }

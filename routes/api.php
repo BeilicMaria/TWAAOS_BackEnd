@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\ProgramController;
@@ -34,12 +35,15 @@ Route::get('/auth/callback', [LoginController::class, 'handleAuthCallback']);
 Route::group(['middleware' => 'auth:api'], function () {
     Route::post('logout', [LogoutController::class, 'logout']);
     //..............................USER............................
-    Route::get('users/{page?}/{per_page?}/{sort?}/{order?}/{filter?}', [UsersController::class, 'index']);
+    Route::get('users/{page?}/{per_page?}/{order?}/{filter?}', [UsersController::class, 'index']);
     Route::get('user/{id}', [UsersController::class, 'get']);
     Route::get('getStaffData', [UsersController::class, 'getStaffData']);
     Route::post('addOrUpdateStaff', [UsersController::class, 'addOrUpdateStaff']);
     Route::post('importUsers', [UsersController::class, 'importUsers']);
     Route::post('deleteUsers', [UsersController::class, 'delete']);
+    Route::post('user', [UsersController::class, 'addOrUpdateStudent']);
+    Route::get('reset', [UsersController::class, 'resetData']);
+
     //..............................ROLE............................
     Route::get('roles', [RolesController::class, 'index']);
     Route::get('role/{id}', [RolesController::class, 'get']);
@@ -54,4 +58,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('programs', [ProgramController::class, 'put']);
     Route::get('programs', [ProgramController::class, 'index']);
     Route::delete('program/{id}', [ProgramController::class, 'delete']);
+    //.............................. Certificates............................
+    Route::post('cerificate', [CertificateController::class, 'post']);
+    Route::get('cerificate/{id}', [CertificateController::class, 'get']);
+    Route::get('certificates/{page?}/{per_page?}/{order?}/{filter?}', [CertificateController::class, 'index']);
 });
