@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\UserRepo;
+use App\Models\Domain;
 use App\Models\Program;
 use App\Models\User;
 use App\Utils\ErrorAndSuccessMessages;
@@ -57,9 +58,15 @@ class UsersController extends Controller
                 $users->orderBy($sort, $order);
             else {
                 $users->orderBy("id", "desc");
+                        $users = $users->get();
+            $finalUsers = array();
+            foreach ($users as  $user) {
+                $domain = Domain::find($user->studyPrograms[0]['FK_domainId']);
+                $user['domain'] = $domain['name'];
+                $user['program'] = $user->studyPrograms[0]['acronym'];
+                array_push($finalUsers, $user);
             }
-            $users = $users->get();
-            return Response::json(["total_count" => $count, "items" => $users], HttpStatusCode::OK);
+            return Response::json(["total_count" => $count, "items" => $finalUsers], HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e->getMessage());
             return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
@@ -210,5 +217,81 @@ class UsersController extends Controller
             Log::debug($e);
             return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
         }
+    }
+
+
+
+    /**
+     * delete
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function delete(Request $request)
+    {
+        $idList = $request->all();
+        try {
+            if (!isset($idList)) {
+                return Response::make(ErrorAndSuccessMessages::deleteFailed, HttpStatusCode::BadRequest);
+            }
+            foreach ($idList as  $idUser) {
+                $user = $this->userRepo->find($idUser);
+                $user->studyPrograms()->detach();
+                $this->userRepo->delete($idUser);
+            }
+            return Response::make(ErrorAndSuccessMessages::deleteSuccess, HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::deleteFailed, HttpStatusCode::BadRequest);
+        }
+    }
+
+
+    /**
+     * addStudent
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function addOrUpdateStudent(Request $request)
+    {
+        try {
+            $student = $request->all();
+            $validator = Validator::make($student, [
+                'lastName' => 'required|string|max:55',
+                'firstName' => 'required|string|max:55',
+                'email' => 'email|required|E-Mail',
+                'financialStatus' => 'required|string|max:55',
+                'peopleSoftId' => 'required|string|max:55',
+                'fathersInitial' => 'required|string',
+                'FK_roleId' => 'required',
+                'program' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
+            }
+            if (isset($request->id)) {
+                $student = $this->userRepo->find($request->id);
+                $student['lastName'] = $request->lastName;
+                $student['firstName'] = $request->lastName;
+                $student['email'] = $request->lastName;
+                $student['financialStatus'] = $request->lastName;
+                $student['peopleSoftId'] = $request->firstName;;
+                $student['fathersInitial'] = $request->email;
+                $student->save();
+                $student->studyPrograms()->sync($request->program);
+            } else {
+                $newStudent = $this->userRepo->create($student);
+                $newStudent->studyPrograms()->attach($request->program);
+            }
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::deleteFailed, HttpStatusCode::BadRequest);
+        }
+    }
+
+
+    public function resetData()
+    {
     }
 }

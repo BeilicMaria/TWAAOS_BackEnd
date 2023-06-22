@@ -39,6 +39,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('getStaffData', [UsersController::class, 'getStaffData']);
     Route::post('addOrUpdateStaff', [UsersController::class, 'addOrUpdateStaff']);
     Route::post('importUsers', [UsersController::class, 'importUsers']);
+    Route::post('deleteUsers', [UsersController::class, 'delete']);
     //..............................ROLE............................
     Route::get('roles', [RolesController::class, 'index']);
     Route::get('role/{id}', [RolesController::class, 'get']);
