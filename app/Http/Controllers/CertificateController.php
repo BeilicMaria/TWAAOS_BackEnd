@@ -55,14 +55,12 @@ class CertificateController extends Controller
             $facultyData = Faculty::all();
             $dean = $this->userRepo->findBy('FK_roleId', 4);
             $secretaries = User::where('FK_roleId', '=', 3)->with(['studyPrograms'])->orderBy("id", "asc")->get();
+            $certificates = Certificate::with(["user_student", "user_student.studyPrograms"])->skip($per_page * ($page - 1))->take($per_page);
             if (isset($filter) && $filter != "" && $filter != "null") {
-                $certificates = Certificate::with(["user_student" => function ($q) use ($filter) {
-                    $q->where('lastName', 'like', "%" . $filter . "%")->orWhere('firstName', 'like', "%" . $filter . "%");
-                }, "user_student.studyPrograms"])->skip($per_page * ($page - 1))->take($per_page);
-            } else {
-                $certificates = Certificate::with(["user_student", "user_student.studyPrograms"])->skip($per_page * ($page - 1))->take($per_page);
+                $certificates->where('number', 'like', "%" . $filter . "%")->orWhere('firstName', 'like', "%" . $filter . "%");
             }
             $count = $certificates->count();
+            $certificates = $certificates->whereIn("status", array(1, 2));
             $certificates->orderBy("id", "desc");
             $certificates = $certificates->get();
             $finalCertificates = array();
@@ -88,7 +86,7 @@ class CertificateController extends Controller
     }
 
     /**
-     * get role by id
+     * get
      *
      * @param  mixed $id
      * @return void
@@ -102,7 +100,7 @@ class CertificateController extends Controller
             $cerificates = Certificate::where('FK_studentId', '=', $id)->with(['user_student'])->get();
             $array = array();
             foreach ($cerificates as  $cerificate) {
-                $cerificate['status'] = $cerificate['status'] == 1 ? "În procesare" : "";
+                $cerificate['status'] = $cerificate['status'] == 1 ? "În procesare" : ($cerificate['status'] == 2 ? "Aprobat" : "Respins");
                 array_push($array, $cerificate);
             }
             return Response::json(["cerificates" => $array], HttpStatusCode::OK);
@@ -135,13 +133,80 @@ class CertificateController extends Controller
             $data['status'] = 1;
             $this->certificateRepo->create($data);
 
-            // $from = "testplatforma321@gmail.com";
-            // $to = 'beilic.maria@gmail.com';
-            // $cc = [];
-            // $subject = ErrorAndSuccessMessages::registerConfirmationSubject;
-            // $message = "<h2>Salutări "  . ",</h2> <p> " . "</p>";
-            // $layout = 'emails.template';
-            // GenericUtils::sendMail($from, $to, $cc, null, $subject, $message, null, $layout);
+            return Response::json("", HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
+    }
+
+
+    /**
+     * aproveCerificate
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function aproveCerificate(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                'number' => 'required',
+                'email' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
+            }
+            $cerificate = Certificate::find($request->id);
+            $cerificate['status'] = 2;
+            $cerificate['number'] =  $request->number;
+            $cerificate['FK_secretaryId'] = $request->FK_secretaryId;
+            $cerificate->save();
+            $from = "testplatforma321@gmail.com";
+            $to = $request->email;
+            $cc = [];
+            $subject = ErrorAndSuccessMessages::registerConfirmationSubject;
+            $message = "<h2>Salutări!"  . "</h2> <p> " . 'Solicitatea ta pentru adeverința de student a fost aprobată. Te aștepăm să o ridic în 1-2 zile.' . "</p>";
+            $layout = 'emails.template';
+            GenericUtils::sendMail($from, $to, $cc, null, $subject, $message, null, $layout);
+            return Response::json("", HttpStatusCode::OK);
+        } catch (Exception $e) {
+            Log::debug($e);
+            return Response::make(ErrorAndSuccessMessages::genericServerError, HttpStatusCode::BadRequest);
+        }
+    }
+
+
+
+    /**
+     * rejectCertificate
+     *
+     * @param  mixed $request
+     * @return void
+     */
+    public function rejectCertificate(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                // 'FK_secretaryId' => 'required',
+                'email' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return Response::make(ErrorAndSuccessMessages::validationError, HttpStatusCode::BadRequest);
+            }
+            $cerificate = Certificate::find($request->id);
+            $cerificate['status'] = 3;
+            $cerificate['FK_secretaryId'] = $request->FK_secretaryId;
+            $cerificate->save();
+            $from = "testplatforma321@gmail.com";
+            $to = $request->email;
+            $cc = [];
+            $subject = ErrorAndSuccessMessages::registerConfirmationSubject;
+            $message = "<h2>Salutări!"  . "</h2> <p> " . 'Ne pare rău să te anunțăm că adeverința solicitată nu poate fi eliberată. Pentru mai multe detalii contactează secretariatul.' . "</p>";
+            $layout = 'emails.template';
+            GenericUtils::sendMail($from, $to, $cc, null, $subject, $message, null, $layout);
             return Response::json("", HttpStatusCode::OK);
         } catch (Exception $e) {
             Log::debug($e);
